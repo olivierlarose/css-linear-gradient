@@ -1,95 +1,39 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import styles from "./page.module.scss";
+import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    const mouse = {
+        x: useMotionValue(0),
+        y: useMotionValue(0)
+    }
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+    const options = {stifness: 70, damping: 50, mass: 1}
+    const smoothMouse = {
+        x: useSpring(mouse.x, options),
+        y: useSpring(mouse.y, options)
+    }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+    const manageMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        mouse.x.set(clientX / window.innerWidth)
+        mouse.y.set(clientY / window.innerHeight)
+    }
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
+    const color1 = useTransform(smoothMouse.y, [0, 1], ["#facb0e", "#fa0e0e"])
+    const color2 = useTransform(smoothMouse.y, [0, 1], ["#f06ba8", "#6b72f0"])
+    const color3 = useTransform(smoothMouse.x, [0, 1], ["#78bae6", "#e6a678"])
+    const background = useMotionTemplate`linear-gradient( 255deg, ${color1}, ${color2} 30%, ${color3} 65%, #fff)`
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    return (
+        <main onMouseMove={(e) => {manageMouseMove(e)}} className={styles.main}>
+            <motion.div 
+                className={styles.gradient}
+                style={{background: background}}
+            >
+            </motion.div>
+            <h1>Gradient On Mouse Move</h1>
+        </main>
+    );
 }
